@@ -152,3 +152,11 @@ body[data-view="sports"] #guideBar,body[data-view="sports"] #grid,body[data-view
 .tg[data-t]{cursor:pointer;text-decoration:underline dotted}
 
 .tabs{display:none}
+.tv-views{margin:0 12px 6px}
+.tb-wrap{margin:0 12px 12px;overflow-x:auto}
+.tb{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.tb th,.tb td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.tb .nm,.tb th:nth-child(2){text-align:left;font-weight:600}
+.tb th{color:var(--muted);font-size:12px}
+.tb tr:nth-child(-n+4) td:first-child{box-shadow:inset 3px 0 var(--c-sports)}
+.tv-hits{margin:6px 12px}.tv-lbl{align-self:center;color:var(--muted);font-size:13px}

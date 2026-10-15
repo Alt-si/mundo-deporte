@@ -115,8 +115,8 @@ for (const e of events) {
   if (c) { if (!c.ch.includes(e[4])) c.ch.push(e[4]); c.t ||= e[6]; c.r ||= e[7]; continue; }
   cands.push({ t: e[6], sp: e[5], r: e[7], s: e[0], e: e[1], a: e[8], b: e[9], ch: [e[4]] });
 }
-let fixtures = [];
-try { fixtures = JSON.parse(readFileSync(new URL("data/fixtures.json", rootUrl))).matches || []; } catch {}
+let fixtures = [], tables = {}, tmeta = {};
+try { const fx = JSON.parse(readFileSync(new URL("data/fixtures.json", rootUrl))); fixtures = fx.matches || []; tables = fx.tables || {}; tmeta = fx.tmeta || {}; } catch {}
 const matches = [], used = new Set();
 for (const f of fixtures) {
   if (f.s + 3 * 3600 <= from || f.s >= to) continue;
@@ -130,7 +130,7 @@ matches.sort((x, y) => x.s - y.s);
 const withCh = matches.filter((m) => m.ch.length).length;
 
 const sports = Object.fromEntries(SPORTS.map(([id, n, e]) => [id, { n, e }]));
-writeFileSync(new URL("data/sports.json", rootUrl), JSON.stringify({ meta: { generated: now, days: DAYS }, sports, channels, suggest, events, matches }));
+writeFileSync(new URL("data/sports.json", rootUrl), JSON.stringify({ meta: { generated: now, days: DAYS }, sports, channels, suggest, events, matches, tables, tmeta }));
 console.log(`Partidos: ${matches.length} (${fixtures.length} de fixtures, ${withCh} con canal)`);
 const by = {};
 for (const e of events) by[e[5]] = (by[e[5]] || 0) + 1;

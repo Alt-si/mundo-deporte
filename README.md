@@ -29,3 +29,11 @@ La pestaña **Deportes** busca por deporte, torneo, equipo/jugador o canal, y mu
 - `tools/build-sports.mjs`: arma `data/sports.json` desde los canales argentinos y los deportivos de otros países.
 - `tools/sports-sites.txt`: fuentes de canales deportivos de otros países (hoy mi.tv de MX, BR, CL, CO, PE, PY). Para sumar más países o fuentes, agregá líneas `ruta|País|código`. El flujo imprime la lista de fuentes disponibles en iptv-org.
 - Un evento solo aparece si algún canal lo transmite y está en esas fuentes; Europa/EE.UU. necesitan otra fuente.
+
+
+## Qué es
+Mundo Deporte es una guía de deportes del mundo (no una guía de TV): eventos de hoy y los próximos 5 días, con canal, horario de Argentina, torneo, fase, fixture, resultados y tablas de posiciones.
+
+- Filtros: deporte (ordenados por relevancia), torneo, día, país del canal y botón "En vivo ahora" (solo eventos que están en emisión en este momento).
+- Vista de torneo: se abre al tocar el nombre de un torneo o al elegirlo en el buscador; muestra etapa, sede, fechas, partidos por fase y tabla de posiciones.
+- Datos: programación de canales (mi.tv) + `tools/fetch-espn.mjs` (API pública de ESPN: partidos, resultados, jugadores de tenis, tablas). Si ESPN falla, la app sigue con la programación de canales.

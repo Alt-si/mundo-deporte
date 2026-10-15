@@ -17,36 +17,17 @@
 <header class="top">
   <div class="top-row">
     <h1>Mundo <span>Deporte</span></h1>
-    <div class="actions" id="guideActions">
-      <button id="zoomOut" class="icon-btn" aria-label="Alejar">−</button>
-      <button id="zoomIn" class="icon-btn" aria-label="Acercar">+</button>
-      <button id="nowBtn" class="pill strong">Ahora</button>
-    </div>
-  </div>
-  <div class="tabs" role="tablist" aria-label="Sección">
-    <button id="tabGuide" role="tab" aria-selected="true">📺 Guía</button>
-    <button id="tabSports" role="tab" aria-selected="false">🏆 Deportes</button>
-  </div>
-  <div id="guideBar">
-    <nav id="days" class="days" aria-label="Día"></nav>
-    <div class="filters">
-      <div id="providers" class="chips" role="group" aria-label="Proveedor"></div>
-      <select id="category" aria-label="Categoría"></select>
-      <input id="search" type="search" placeholder="Buscar canal o programa" aria-label="Buscar">
-    </div>
-    <div id="banner" class="banner" hidden></div>
   </div>
 </header>
 
-<main id="grid" class="grid" tabindex="0" aria-label="Grilla de programación"></main>
-<section id="sports" class="sports" aria-label="Deportes" hidden></section>
+<section id="sports" class="sports" aria-label="Deportes"></section>
 
 <dialog id="sheet">
   <form method="dialog"><button class="close" aria-label="Cerrar">×</button></form>
   <div id="sheetBody"></div>
 </dialog>
 
-<script src="app.js"></script>
+<script src="util.js"></script>
 <script src="sports.js"></script>
 </body>
 </html>

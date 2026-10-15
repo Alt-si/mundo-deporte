@@ -72,9 +72,9 @@ jobs:
           for f in $files; do grep -o ' channel="[^"]*"' $f | sort | uniq -c | sort -n | head -50; done
           node tools/xmltv-to-json.mjs $files
 
-      - name: Descargar fixtures (jugadores y equipos)
+      - name: Descargar fixtures, resultados y tablas (ESPN)
         continue-on-error: true
-        run: node tools/fetch-fixtures.mjs
+        run: node tools/fetch-espn.mjs
 
       - name: Construir deportes
         run: node tools/build-sports.mjs xmltv/sports
