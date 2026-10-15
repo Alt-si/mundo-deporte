@@ -215,13 +215,13 @@ function spTournament() {
   <div class="tv-head s-${sid}"><div class="tv-name">${sp.e || ""} ${esc(T)}</div>
     <div class="tv-meta">${esc(sp.n || "")}${venue ? " · " + esc(venue) : ""}${all.length || tm.s ? " · " + fd(dMin) + " – " + fd(dMax - 1) : ""}</div>
     ${tm.stage ? `<div class="tv-phase">Etapa: <b>${esc(tm.stage)}</b></div>` : cur[0] && cur[0] !== "Sin fase" ? `<div class="tv-phase">Fase actual: <b>${esc(cur[0])}</b></div>` : ""}
-    <div class="tv-ch">Se emite en: ${[...chs].map((c) => esc((d.channels[c] || {}).n || c)).join(", ")}</div></div>`;
+    <div class="tv-ch">Se emite en: ${[...new Set([...chs].map((c) => ((d.channels[c] || {}).n || c).replace(/\s+(HD|Básico)$/i, "")))].slice(0, 14).map(esc).join(", ")}</div></div>`;
   if (tbl) h += `<div class="sp-chips tv-views"><button class="chip" data-v="partidos" aria-pressed="${ss.view !== "tabla"}">Partidos</button><button class="chip" data-v="tabla" aria-pressed="${ss.view === "tabla"}">Tabla de posiciones</button></div>`;
   if (tbl && ss.view === "tabla") return h + spTable(tbl) + `<p class="sp-note">Tablas de ESPN, actualizadas con cada carga de datos.</p>`;
   if (rounds.length > 1) h += `<div class="sp-chips tv-rounds"><button class="chip" data-r="all" aria-pressed="${ss.round === "all"}">Todas las fases</button>${rounds.map((r) => `<button class="chip" data-r="${esc(r)}" aria-pressed="${ss.round === r}">${esc(r)}</button>`).join("")}</div>`;
   h += `<div class="sp-sum">${hasPlayers.length} ${hasPlayers.length === 1 ? "partido" : "partidos"}${rest.length ? ` · ${rest.length} transmisiones` : ""} · horario de Argentina</div>`;
   const dayHead = (t) => { const k = Math.floor((Math.max(t, t0) + TZ) / 86400), dt = new Date(k * 86400000), rel = k - Math.floor((now + TZ) / 86400); return `<h3 class="sp-day">${rel === 0 ? "Hoy" : rel === 1 ? "Mañana" : DOW[dt.getUTCDay()]} · ${dt.getUTCDate()} ${MON[dt.getUTCMonth()]}</h3>`; };
-  const chNames = (ids) => ids.map((c) => esc((d.channels[c] || {}).n || c)).join(" · ");
+  const chNames = (ids) => [...new Set(ids.map((c) => (d.channels[c] || {}).n || c))].map(esc).join(" · ");
   let last = null;
   h += '<div class="tl">';
   for (const i of hasPlayers.sort((a, b) => d.matches[a].s - d.matches[b].s)) {
