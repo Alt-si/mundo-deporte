@@ -130,14 +130,19 @@ const has = (hay, w) => hay.includes(pad(norm(w)));
 const longest = [...TOURNAMENTS].sort((a, b) =>
   Math.max(...b[2].map((w) => w.length)) - Math.max(...a[2].map((w) => w.length)));
 
+// Si el texto menciona varios torneos, gana el que aparece primero (la descripción arranca con el torneo propio y
+// recién después compara con otros: "Europa League, la segunda competición después de la Champions League").
 function tournamentIn(hay) {
+  let best = null;
   for (const [name, sport, words, o] of longest) {
-    if (!words.some((w) => has(hay, w))) continue;
+    const pos = words.map((w) => hay.indexOf(pad(norm(w)))).filter((i) => i >= 0);
+    if (!pos.length) continue;
     if (o?.needs && !o.needs.some((w) => has(hay, w))) continue;
     if (o?.not && o.not.some((w) => has(hay, w))) continue;
-    return { sport, tournament: name };
+    const at = Math.min(...pos);
+    if (!best || at < best.at) best = { at, sport, tournament: name };
   }
-  return null;
+  return best && { sport: best.sport, tournament: best.tournament };
 }
 function sportIn(hay) {
   for (const [id, , , words] of SPORTS) if (words.some((w) => has(hay, w))) return id;

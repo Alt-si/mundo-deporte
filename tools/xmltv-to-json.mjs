@@ -64,6 +64,10 @@ for (const f of files) {
 }
 for (const id in programs) programs[id].sort((x, y) => x[0] - y[0]);
 
+// La fuente (mi.tv) trae cruzadas estas señales: la grilla de una es la de la otra. Se intercambian antes de fusionar.
+const SWAP = [["ESPN.ar", "ESPN2.ar"]];
+for (const [a, b] of SWAP) if (programs[a] && programs[b]) [programs[a], programs[b]] = [programs[b], programs[a]];
+
 // Fusionar con lo ya guardado: la fuente cuenta los días en UTC, así que una corrida de noche (después de las 21 h de
 // Argentina) ya no trae el final del día actual. Conservamos lo viejo que no se superpone con lo nuevo.
 const outUrl = new URL("../data/epg.json", import.meta.url);

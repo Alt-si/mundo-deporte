@@ -111,8 +111,10 @@ const DUR = { futbol: 7200, tenis: 10800, padel: 5400, basquet: 9000, voley: 720
 const cands = [];
 for (const e of events) {
   if (!e[8] || !e[9] || e[5] === "otros") continue;
-  const c = cands.find((x) => x.sp === e[5] && Math.abs(x.s - e[0]) <= 5400 && ((sameName(x.a, e[8]) && sameName(x.b, e[9])) || (sameName(x.a, e[9]) && sameName(x.b, e[8]))));
+  const same = (x) => x.sp === e[5] && ((sameName(x.a, e[8]) && sameName(x.b, e[9])) || (sameName(x.a, e[9]) && sameName(x.b, e[8])));
+  const c = cands.find((x) => same(x) && Math.abs(x.s - e[0]) <= 5400);
   if (c) { if (!c.ch.includes(e[4])) c.ch.push(e[4]); c.t ||= e[6]; c.r ||= e[7]; continue; }
+  if (cands.some((x) => same(x) && Math.abs(x.s - e[0]) <= 2 * 86400)) continue; // repetición del mismo partido: no es otro partido
   cands.push({ t: e[6], sp: e[5], r: e[7], s: e[0], e: e[1], a: e[8], b: e[9], ch: [e[4]] });
 }
 let fixtures = [], tables = {}, tmeta = {};
