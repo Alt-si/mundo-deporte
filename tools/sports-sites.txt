@@ -1,0 +1,6 @@
+mi.tv/mi.tv_mx.channels.xml|México|mx
+mi.tv/mi.tv_br.channels.xml|Brasil|br
+mi.tv/mi.tv_cl.channels.xml|Chile|cl
+mi.tv/mi.tv_co.channels.xml|Colombia|co
+mi.tv/mi.tv_pe.channels.xml|Perú|pe
+mi.tv/mi.tv_py.channels.xml|Paraguay|py
