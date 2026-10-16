@@ -6,29 +6,21 @@ const BASE = process.env.ESPN_BASE || "https://site.api.espn.com/apis";
 const CORE = process.env.ESPN_CORE || "https://sports.core.api.espn.com/v2/sports/soccer/leagues?limit=1000";
 const OUT = "data/fixtures.json";
 
-// [slug, nombre, orden, ¿solo partidos con equipos argentinos?]
-const KNOWN = [
-  ["arg.1", "Liga Profesional", 1, false], ["arg.copa", "Copa Argentina", 2, false],
-  ["conmebol.libertadores", "Copa Libertadores", 3, true], ["conmebol.sudamericana", "Copa Sudamericana", 4, true],
-  ["arg.2", "Primera Nacional", 5, false], ["arg.3", "Primera B Metropolitana", 6, false], ["arg.4", "Primera C", 7, false],
-  ["arg.supercopa", "Supercopa Argentina", 8, false], ["arg.trofeo", "Trofeo de Campeones", 9, false],
-  ["conmebol.recopa", "Recopa Sudamericana", 10, true], ["fifa.worldq.conmebol", "Eliminatorias Sudamericanas", 11, true],
-  ["fifa.friendly", "Amistosos de la Selección", 12, true], ["conmebol.america", "Copa América", 13, true], ["fifa.world", "Mundial", 14, true],
-  ["arg.w.1", "Liga Femenina", 15, false],
-];
+// [slug, nombre, orden, ¿solo partidos con equipos argentinos?, región/país del torneo]
+const KNOWN = JSON.parse(fs.readFileSync("data/leagues.json", "utf8")).map((l) => [l.slug, l.name, l.rank, l.onlyArg, l.co]);
 const SELECCION_ID = "202"; // Argentina en ESPN
 const get = async (u) => { const r = await fetch(u, { headers: { "user-agent": "mundo-deporte" } }); if (!r.ok) throw new Error(r.status + " " + u); return r.json(); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const ymd = (d) => d.toISOString().slice(0, 10).replaceAll("-", "");
 const sec = (x) => { const t = Date.parse(x); return t ? Math.floor(t / 1000) : 0; };
-const diag = [], log = (...a) => console.log(...a);
+const diag = [], lines = [], log = (...a) => { const t = a.join(" "); lines.push(t); console.log(t); };
 
 // 1) Ligas: las conocidas + cualquier "arg.*" que ESPN tenga
-const leagues = new Map(KNOWN.map(([slug, name, rank, onlyArg]) => [slug, { slug, name, rank, onlyArg }]));
+const leagues = new Map(KNOWN.map(([slug, name, rank, onlyArg, co]) => [slug, { slug, name, rank, onlyArg, co }]));
 try {
   const j = await get(CORE);
   const found = (j.items || []).map((i) => /\/leagues\/([^/?]+)/.exec(i.$ref || "")?.[1]).filter(Boolean);
-  for (const slug of found) if (/^arg\./.test(slug) && !leagues.has(slug)) leagues.set(slug, { slug, name: "", rank: 30, onlyArg: false });
+  for (const slug of found) if (/^arg\./.test(slug) && !leagues.has(slug)) leagues.set(slug, { slug, name: "", rank: 30, onlyArg: false, co: "Argentina" });
   log(`Ligas argentinas en ESPN: ${found.filter((s) => /^arg\./.test(s)).join(", ") || "(ninguna)"}`);
 } catch (e) { log("No se pudo listar ligas de ESPN:", e.message); }
 
@@ -68,7 +60,7 @@ for (const l of leagues.values()) {
       if (seen.has(l.slug + id)) continue; seen.add(l.slug + id);
       const v = comp.venue || {};
       matches.push({
-        id, lg: l.slug, t: name, s: sec(ev.date), st,
+        id, lg: l.slug, t: name, cs: l.co === "Argentina" ? ["Argentina"] : ["Argentina", l.co], s: sec(ev.date), st,
         ...(st !== "pre" ? { sc: [home.score ?? "", away.score ?? ""] } : {}),
         ck: clock(comp.status ? comp : ev),
         a: home.team?.displayName || "", b: away.team?.displayName || "",
@@ -78,8 +70,8 @@ for (const l of leagues.values()) {
       });
       kept++;
     }
-  } catch (e) { err = e.message; }
-  if (!err || kept) tournaments.push({ key: l.slug, name: name || l.slug, rank: l.rank });
+  } catch (e) { err = e.message; log("ERROR", l.slug, e.message); }
+  if (!err || kept) tournaments.push({ key: l.slug, name: name || l.slug, rank: l.rank, co: l.co, cs: l.co === "Argentina" ? ["Argentina"] : ["Argentina", l.co] });
   diag.push({ lg: l.slug, ev: nev, kept, err });
   await sleep(500);
   try {
@@ -96,7 +88,7 @@ for (const l of leagues.values()) {
 }
 log(`ESPN: ${matches.length} partidos, ${tournaments.length} torneos, ${Object.keys(tables).length} tablas`);
 for (const d of diag) log(`  ${d.lg}: ${d.ev} eventos, ${d.kept} usados${d.err ? " ERROR " + d.err : ""}`);
-if (matches.length || tournaments.length) {
-  if (!matches.length && fs.existsSync(OUT)) log("Sin partidos: se conserva el archivo anterior");
-  else fs.writeFileSync(OUT, JSON.stringify({ meta: { at: Date.now(), diag }, tournaments, matches, tables }));
-}
+// Estado de la última corrida (siempre se escribe, para poder diagnosticar)
+fs.writeFileSync("data/status.json", JSON.stringify({ at: new Date().toISOString(), matches: matches.length, tournaments: tournaments.length, node: process.version, diag, log: lines.slice(-60) }, null, 1));
+if (matches.length) fs.writeFileSync(OUT, JSON.stringify({ meta: { at: Date.now() }, tournaments, matches, tables }));
+else log("Sin partidos: se conserva data/fixtures.json anterior");

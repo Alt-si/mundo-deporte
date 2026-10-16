@@ -1,0 +1,107 @@
+[
+{
+"slug": "arg.1",
+"name": "Liga Profesional",
+"rank": 1,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "arg.copa",
+"name": "Copa Argentina",
+"rank": 2,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "conmebol.libertadores",
+"name": "Copa Libertadores",
+"rank": 3,
+"onlyArg": true,
+"co": "Sudamérica"
+},
+{
+"slug": "conmebol.sudamericana",
+"name": "Copa Sudamericana",
+"rank": 4,
+"onlyArg": true,
+"co": "Sudamérica"
+},
+{
+"slug": "arg.2",
+"name": "Primera Nacional",
+"rank": 5,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "arg.3",
+"name": "Primera B Metropolitana",
+"rank": 6,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "arg.4",
+"name": "Primera C",
+"rank": 7,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "arg.supercopa",
+"name": "Supercopa Argentina",
+"rank": 8,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "arg.trofeo",
+"name": "Trofeo de Campeones",
+"rank": 9,
+"onlyArg": false,
+"co": "Argentina"
+},
+{
+"slug": "conmebol.recopa",
+"name": "Recopa Sudamericana",
+"rank": 10,
+"onlyArg": true,
+"co": "Sudamérica"
+},
+{
+"slug": "fifa.worldq.conmebol",
+"name": "Eliminatorias Sudamericanas",
+"rank": 11,
+"onlyArg": true,
+"co": "Sudamérica"
+},
+{
+"slug": "fifa.friendly",
+"name": "Amistosos de la Selección",
+"rank": 12,
+"onlyArg": true,
+"co": "Mundial"
+},
+{
+"slug": "conmebol.america",
+"name": "Copa América",
+"rank": 13,
+"onlyArg": true,
+"co": "Sudamérica"
+},
+{
+"slug": "fifa.world",
+"name": "Mundial",
+"rank": 14,
+"onlyArg": true,
+"co": "Mundial"
+},
+{
+"slug": "arg.w.1",
+"name": "Liga Femenina",
+"rank": 15,
+"onlyArg": false,
+"co": "Argentina"
+}
+]
