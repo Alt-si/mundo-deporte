@@ -55,6 +55,7 @@ function bcast(comp) {
   const a = (comp.broadcasts || []).flatMap((b) => b.names || []), b = (comp.geoBroadcasts || []).map((g) => g.media?.shortName).filter(Boolean);
   return [...new Set([...a, ...b])];
 }
+const clock = (o) => { const t = o?.status?.type; return t?.state === "in" ? (t.shortDetail || o.status.displayClock || "") : ""; };
 function status(o) { const s = o?.status?.type?.state; return s === "in" ? "in" : s === "post" ? "post" : "pre"; }
 function venue(comp, ev) { const v = comp?.venue || ev?.venue || {}; return [v.fullName || v.displayName, v.address?.city, v.address?.country].filter(Boolean).join(", "); }
 
@@ -73,7 +74,7 @@ for (const [sport, lg, sp, fb, hasTable, co] of LEAGUES) {
           const cs = c.competitors || []; if (cs.length < 2) continue;
           const s = sec(c.startDate || c.date); if (!s) continue;
           const st = status(c), sc = cs.map((x) => (x.linescores || []).map((l) => l.value).join("-"));
-          push({ s, sp, t, r: roundEs(c.round?.displayName), a: team(cs[0]), b: team(cs[1]), v: venue(c, ev), st, ...(st !== "pre" ? { sc } : {}), ...(g.grouping?.displayName ? { d: g.grouping.displayName } : {}), bc: bcast(c) });
+          push({ s, sp, t, id: String(c.id || ""), lg: `${sport}/${lg}`, ck: clock(c), r: roundEs(c.round?.displayName), a: team(cs[0]), b: team(cs[1]), v: venue(c, ev), st, ...(st !== "pre" ? { sc } : {}), ...(g.grouping?.displayName ? { d: g.grouping.displayName } : {}), bc: bcast(c) });
         }
         continue;
       }
@@ -98,7 +99,7 @@ for (const [sport, lg, sp, fb, hasTable, co] of LEAGUES) {
       if (!home || !away) continue;
       const st = status(comp.status ? comp : ev);
       const r = roundEs(comp.notes?.[0]?.headline) || (j.week?.number ? "Fecha " + j.week.number : "") || (ev.season?.slug === "post-season" ? "Playoffs" : "");
-      push({ s: sec(ev.date), sp, t, r, a: team(home), b: team(away), v: venue(comp, ev), st, ...(st !== "pre" ? { sc: [home.score, away.score] } : {}), co, bc: bcast(comp) });
+      push({ s: sec(ev.date), sp, t, id: String(ev.id || ""), lg: `${sport}/${lg}`, ck: clock(comp.status ? comp : ev), r, a: team(home), b: team(away), v: venue(comp, ev), st, ...(st !== "pre" ? { sc: [home.score, away.score] } : {}), co, bc: bcast(comp) });
       tmeta[t] ||= { sp, v: "", s: 0, e: 0, stage: "", co };
       const lg0 = j.leagues?.[0]; if (lg0?.season) { tmeta[t].s ||= sec(lg0.season.startDate); tmeta[t].e ||= sec(lg0.season.endDate); }
     }

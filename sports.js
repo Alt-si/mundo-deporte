@@ -16,7 +16,7 @@ async function spLoad() {
     const d = (ss.data = await fetch("data/sports.json" + bust).then((r) => r.json()));
     const tm = d.tmeta || {}, items = [];
     const fxT = new Set(d.matches.filter((m) => m.fx).map((m) => m.t));
-    d.matches.forEach((m, i) => items.push({ k: "m", i, s: m.s, e: m.e, sp: m.sp, t: m.t, r: m.r || "", a: m.a || "", b: m.b || "", n: m.n || "", ch: m.ch || [], bc: m.bc || [], v: m.v || "", st: m.st, sc: m.sc, d: m.d || "", co: m.co || (tm[m.t] || {}).co || "" }));
+    d.matches.forEach((m, i) => items.push({ k: "m", i, s: m.s, e: m.e, sp: m.sp, t: m.t, r: m.r || "", a: m.a || "", b: m.b || "", n: m.n || "", ch: m.ch || [], bc: m.bc || [], v: m.v || "", st: m.st, sc: m.sc, d: m.d || "", co: m.co || (tm[m.t] || {}).co || "", id: m.id || "", lg: m.lg || "", ck: m.ck || "" }));
     const merged = new Map();
     d.events.forEach((e, i) => {
       if (e[8] || REPLAY.test(norm(e[2] + " " + (e[3] || "").slice(0, 60)))) return;   // con rivales: ya están en d.matches
@@ -199,16 +199,17 @@ function spCards(list, now) {
     if (k !== last) { last = k; h += head; }
     const live = isLive(x, now), done = x.st === "post" || (!live && x.e <= now);
     const chs = spChannels(x), pair = x.a && x.b;
-    const meta = [x.t ? `<span class="tg" data-t="${esc(x.t)}">${esc(x.t)}</span>` : "", [x.r, x.d].filter(Boolean).map(esc).join(" · "), x.co ? esc(x.co) : "", x.v ? "📍 " + esc(x.v) : ""].filter(Boolean).join('<i>·</i>');
+    const sub = [x.t ? `<span class="tg" data-t="${esc(x.t)}">${esc(x.t)}</span>` : "", [x.r, x.d].filter(Boolean).map(esc).join(" · ")].filter(Boolean).join(" ");
+    const started = live || done || x.st === "post";
+    const sc = (n) => `<b class="pt">${started && x.sc && x.sc[n] !== "" && x.sc[n] != null ? esc(String(x.sc[n]).replace(/-/g, " ")) : "–"}</b>`;
+    const clk = live ? `<span class="ck">⏱ ${esc(x.ck || "En juego")}</span>` : "";
     h += `<button class="it s-${x.sp}${done ? " past" : ""}" data-i="${i}">
       <span class="when"><b>${fmtTime(x.s)}</b><small>hs</small></span>
       <span class="ico" title="${esc((ss.data.sports[x.sp] || {}).n || "")}" aria-hidden="true">${(ss.data.sports[x.sp] || {}).e || "🏅"}</span>
       <span class="body">
-        ${pair ? `<span class="tm"><span>${esc(x.a)}</span>${scoreRow(x.sc, 0)}</span><span class="tm"><span>${esc(x.b)}</span>${scoreRow(x.sc, 1)}</span>` : `<span class="ttl">${esc(x.n || x.t)}</span>`}
-        ${meta ? `<span class="meta">${meta}</span>` : ""}
-        ${chs.length ? `<span class="tvs">📺 ${esc(chText(chs, 3))}</span>` : ""}
-      </span>
-      ${live ? '<span class="live">EN VIVO</span>' : done && x.st === "post" ? '<span class="fin">Final</span>' : ""}</button>`;
+        ${pair ? `<span class="vsl"><span class="side">${esc(x.a)} ${sc(0)}</span><span class="vs">vs</span><span class="side">${esc(x.b)} ${sc(1)}</span></span>` : `<span class="ttl">${esc(x.n || x.t)}</span>`}
+        <span class="meta">${sub}${clk}${live ? '<span class="live">EN VIVO</span>' : done && x.st === "post" ? '<span class="fin">Final</span>' : ""}</span>
+      </span></button>`;
   }
   return h;
 }
@@ -247,6 +248,12 @@ function spTable(groups) {
   return groups.map((g) => `<div class="tb-wrap">${g.g ? `<h3 class="sp-day">${esc(g.g)}</h3>` : ""}<table class="tb"><thead><tr><th>#</th><th>Equipo</th>${cols.map(([, l]) => `<th>${l}</th>`).join("")}</tr></thead><tbody>${g.rows.map((r, n) => `<tr><td>${n + 1}</td><td class="nm">${esc(r.n)}</td>${cols.map(([k]) => `<td>${esc(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
 }
 
+function spAbout(x, sp, status) {
+  const par = x.a && x.b ? `${x.a} y ${x.b}` : "";
+  const bits = [sp.n ? `${par ? "Partido" : "Evento"} de ${sp.n.toLowerCase()}` : "Evento deportivo", x.t ? `de ${x.t}` : "", x.r ? `(${x.r})` : "", par ? `entre ${par}` : "", x.v ? `en ${x.v}` : x.co ? `en ${x.co}` : ""].filter(Boolean);
+  return bits.join(" ") + ". " + (status === "En vivo ahora" ? "Se está jugando ahora." : status === "Próximo" ? "Todavía no empezó." : "Ya terminó.");
+}
+
 function spSheet(i) {
   const d = ss.data, x = ss.items[i], sp = d.sports[x.sp] || {}, now = nowSec();
   const dd = new Date((x.s + TZ) * 1000), live = isLive(x, now);
@@ -261,7 +268,8 @@ function spSheet(i) {
     (x.r || x.d ? `<div class="meta"><b>Fase:</b> ${esc([x.r, x.d].filter(Boolean).join(" · "))}</div>` : "") +
     (x.co ? `<div class="meta"><b>País:</b> ${esc(x.co)}</div>` : "") +
     (x.v ? `<div class="meta">📍 ${esc(x.v)}</div>` : "") +
-    (x.desc ? `<p>${esc(x.desc)}</p>` : "") +
+    (isLive(x, now) && x.ck ? `<div class="meta"><b>Tiempo de juego:</b> ${esc(x.ck)}</div>` : "") +
+    `<p>${esc(x.desc || spAbout(x, sp, status))}</p>` +
     `<div class="meta"><b>Dónde verlo:</b></div>` +
     (chs.length ? `<ul>${chs.map((c) => `<li>${esc(c.n)} <span class="meta">(${esc(c.c)})</span></li>`).join("")}</ul>` : `<div class="meta">Sin transmisión informada.</div>`) +
     (chs.length && !chs.some((c) => c.c === "Argentina") ? `<div class="meta">No figura en canales de Argentina: puede verse por plataformas de otros países.</div>` : "") +
@@ -271,8 +279,46 @@ function spSheet(i) {
   $("#sheet").showModal();
 }
 
+// Resultados y reloj en vivo: se consultan a ESPN desde el navegador cada minuto, solo para las ligas con partidos en juego.
+let spBusy = false;
+async function spLiveRefresh() {
+  if (!ss.data || spBusy) return;
+  const now = nowSec(), lgs = new Set();
+  for (const x of ss.items) if (x.lg && x.id && x.st !== "post" && x.s - 600 <= now && now < x.e + 1800) lgs.add(x.lg);
+  if (!lgs.size) return;
+  spBusy = true;
+  let changed = false;
+  try {
+    await Promise.all([...lgs].slice(0, 12).map(async (lg) => {
+      try {
+        const j = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${lg}/scoreboard`).then((r) => r.json());
+        const byId = new Map();
+        for (const ev of j.events || []) {
+          if (ev.groupings) for (const g of ev.groupings) for (const c of g.competitions || []) byId.set(String(c.id), { c, o: c });
+          else byId.set(String(ev.id), { c: ev.competitions?.[0], o: ev });
+        }
+        for (const x of ss.items) {
+          if (x.lg !== lg || !x.id) continue;
+          const r = byId.get(x.id); if (!r || !r.c) continue;
+          const t = (r.c.status || r.o.status)?.type || {}, cs = r.c.competitors || [];
+          const st = t.state === "in" ? "in" : t.state === "post" ? "post" : "pre";
+          let sc = x.sc;
+          if (cs.length >= 2 && st !== "pre") {
+            if (x.sp === "tenis") sc = cs.slice(0, 2).map((q) => (q.linescores || []).map((l) => l.value).join("-"));
+            else { const h = cs.find((q) => q.homeAway === "home") || cs[0], a = cs.find((q) => q.homeAway === "away") || cs[1]; sc = [h.score, a.score]; }
+          }
+          const ck = st === "in" ? t.shortDetail || (r.c.status || r.o.status)?.displayClock || "" : "";
+          if (st !== x.st || ck !== x.ck || JSON.stringify(sc) !== JSON.stringify(x.sc)) { x.st = st; x.ck = ck; x.sc = sc; changed = true; }
+        }
+      } catch {}
+    }));
+  } finally { spBusy = false; }
+  if (changed && !$("#sheet").open) spRender();
+}
+
 async function init() {
   if (await spLoad()) { spShell(); spRender(); }
 }
-setInterval(() => { if (ss.data) spRender(); }, 60000);
+setInterval(() => { if (ss.data) { spRender(); spLiveRefresh(); } }, 60000);
+setTimeout(() => spLiveRefresh(), 1500);
 init();
