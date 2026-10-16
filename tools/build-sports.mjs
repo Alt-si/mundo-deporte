@@ -119,15 +119,22 @@ for (const e of events) {
 }
 let fixtures = [], tables = {}, tmeta = {};
 try { const fx = JSON.parse(readFileSync(new URL("data/fixtures.json", rootUrl))); fixtures = fx.matches || []; tables = fx.tables || {}; tmeta = fx.tmeta || {}; } catch {}
+// País del evento: del fixture, del torneo o de la sede ("Shanghai, China PR")
+const TOUR_CO = { "Champions League": "Europa", "Europa League": "Europa", "Conference League": "Europa", "Copa Libertadores": "Sudamérica", "Copa Sudamericana": "Sudamérica", "Recopa Sudamericana": "Sudamérica", "Liga Profesional": "Argentina", "Copa Argentina": "Argentina", "Copa de la Liga": "Argentina", "Primera Nacional": "Argentina", "Premier League": "Inglaterra", "FA Cup": "Inglaterra", LaLiga: "España", "Copa del Rey": "España", "Serie A (Italia)": "Italia", Bundesliga: "Alemania", "Ligue 1": "Francia", Eredivisie: "Países Bajos", "Liga Portugal": "Portugal", "Brasileirão": "Brasil", "Liga MX": "México", MLS: "Estados Unidos", NBA: "Estados Unidos", WNBA: "Estados Unidos", NFL: "Estados Unidos", NHL: "Estados Unidos", MLB: "Estados Unidos", UFC: "Estados Unidos", "PGA Tour": "Estados Unidos", Eliminatorias: "Sudamérica", "Copa del Mundo (fútbol)": "Mundial", "Roland Garros": "Francia", Wimbledon: "Reino Unido", "US Open (tenis)": "Estados Unidos", "Australian Open": "Australia", "Euroliga": "Europa", "Seis Naciones": "Europa", "Top 14": "Francia", "URBA / Top 12": "Argentina", "Liga Nacional de Básquet": "Argentina", "Turismo Carretera": "Argentina", "Fórmula 1": "Mundial", MotoGP: "Mundial" };
+const CO_ES = { "China PR": "China", China: "China", Belgium: "Bélgica", France: "Francia", Kazakhstan: "Kazajistán", Spain: "España", Portugal: "Portugal", Italy: "Italia", USA: "Estados Unidos", "United States": "Estados Unidos", Switzerland: "Suiza", Austria: "Austria", Germany: "Alemania", Japan: "Japón", Australia: "Australia", "Great Britain": "Reino Unido", "United Kingdom": "Reino Unido", England: "Inglaterra", Sweden: "Suecia", Netherlands: "Países Bajos", Argentina: "Argentina", Brazil: "Brasil", Chile: "Chile", Colombia: "Colombia", Mexico: "México", Canada: "Canadá", Qatar: "Catar", UAE: "Emiratos Árabes", "United Arab Emirates": "Emiratos Árabes", "Saudi Arabia": "Arabia Saudita", Singapore: "Singapur", "South Korea": "Corea del Sur", Korea: "Corea del Sur", India: "India", Thailand: "Tailandia", Hungary: "Hungría", Croatia: "Croacia", Serbia: "Serbia", Poland: "Polonia", Greece: "Grecia", Morocco: "Marruecos", Turkey: "Turquía", Denmark: "Dinamarca", Norway: "Noruega", Finland: "Finlandia", Romania: "Rumania", "Czech Republic": "Chequia", Czechia: "Chequia", Slovakia: "Eslovaquia", Slovenia: "Eslovenia", Bulgaria: "Bulgaria", Uzbekistan: "Uzbekistán", Ecuador: "Ecuador", Uruguay: "Uruguay", Peru: "Perú", Paraguay: "Paraguay", "New Zealand": "Nueva Zelanda", "South Africa": "Sudáfrica", Ireland: "Irlanda", Scotland: "Escocia", Monaco: "Mónaco", Bahrain: "Baréin", Azerbaijan: "Azerbaiyán", Hong: "Hong Kong", Taiwan: "Taiwán", Israel: "Israel", Egypt: "Egipto", Malaysia: "Malasia", Indonesia: "Indonesia", Philippines: "Filipinas", Vietnam: "Vietnam" };
+const coOf = (v) => { const last = String(v || "").split(",").pop().trim(); return CO_ES[last] || ""; };
 const matches = [], used = new Set();
 for (const f of fixtures) {
-  if (f.s + 3 * 3600 <= from || f.s >= to) continue;
+  if ((f.e || f.s + 3 * 3600) <= from || f.s >= to) continue;
   const i = cands.findIndex((c, k) => !used.has(k) && Math.abs(c.s - f.s) <= 4 * 3600 && ((sameName(f.a, c.a) && sameName(f.b, c.b)) || (sameName(f.a, c.b) && sameName(f.b, c.a))));
   let ch = [];
   if (i >= 0) { used.add(i); ch = cands[i].ch; }
-  matches.push({ ...f, r: f.r || (i >= 0 ? cands[i].r : ""), t: f.t || (i >= 0 ? cands[i].t : ""), e: f.s + (DUR[f.sp] || 7200), ch });
+  matches.push({ ...f, fx: 1, r: f.r || (i >= 0 ? cands[i].r : ""), t: f.t || (i >= 0 ? cands[i].t : ""), e: f.e || f.s + (DUR[f.sp] || 7200), ch });
 }
 cands.forEach((c, k) => { if (!used.has(k)) matches.push({ ...c, ch: c.ch }); });
+for (const m of matches) m.co = m.co || (tmeta[m.t] || {}).co || TOUR_CO[m.t] || coOf(m.v) || "";
+for (const [t, o] of Object.entries(tmeta)) o.co ||= TOUR_CO[t] || coOf(o.v) || "";
+for (const e of events) if (e[6] && !tmeta[e[6]]) tmeta[e[6]] = { sp: e[5], v: "", s: 0, e: 0, stage: "", co: TOUR_CO[e[6]] || "" };
 matches.sort((x, y) => x.s - y.s);
 const withCh = matches.filter((m) => m.ch.length).length;
 
