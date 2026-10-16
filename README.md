@@ -1,39 +1,8 @@
-# Mundo Deporte
+# Mundo Deporte · Fútbol argentino
 
-PWA (se instala en Android y Mac/Chrome/Safari) con la programación de canales de DIRECTV, Flow y Telecentro en una línea de tiempo, para 5 días.
+App web (PWA) con los partidos del día del fútbol argentino: horarios de Argentina, escudos, resultados en vivo con el tiempo de juego y resultado final. Agrupados por torneo, con tablas de posiciones.
 
-## Cómo se usa
-1. Subí esta carpeta a un repositorio de GitHub y activá **GitHub Pages** (Settings → Pages → rama `main`, carpeta raíz).
-2. Abrí la URL en Android (Chrome → "Instalar app") o en Mac (Chrome → ícono instalar; Safari → Archivo → Agregar al Dock).
-3. Probar local: `python3 -m http.server 8123` y abrir http://localhost:8123
-
-## Programación real (actualización automática)
-La app lee `data/epg.json`. Ahora trae **datos de demostración** (aparece un cartel amarillo).
-`.github/workflows/update-epg.yml` corre cada 6 horas, baja las grillas con [iptv-org/epg](https://github.com/iptv-org/epg), las convierte con `tools/xmltv-to-json.mjs` (hoy + 4 días) y hace commit de `data/epg.json`.
-
-**Pendiente de verificar en la primera ejecución** (no pude probarlo desde mi entorno, sin acceso a esos sitios):
-- `tools/sites.txt`: sitios fuente (`directv.com.ar`, `mi.tv`). Si alguno falla, mirá el log y cambialo por otro de iptv-org/epg.
-- Los ids de canal en `tools/make-channels.mjs` (ej. `Telefe.ar`) pueden no coincidir con los de la fuente. El log lista "Canales sin datos" e "Ids sin mapear"; agregá `alias` y corré `node tools/make-channels.mjs`.
-- Qué canal está en qué proveedor (`providers`) es una suposición razonable: corregila contra las grillas oficiales.
-
-## Archivos
-- `app.js`, `styles.css`, `index.html`: la app. `sw.js`: modo offline (última grilla guardada).
-- `tools/make-channels.mjs`: lista de canales. `tools/make-demo.mjs`: datos de demo.
-
-## Google Play
-Ver `play/GUIA-GOOGLE-PLAY.md`. Importante: nombrá el repositorio `TU-USUARIO.github.io` para que la app quede en la raíz del dominio.
-
-## Deportes
-La pestaña **Deportes** busca por deporte, torneo, equipo/jugador o canal, y muestra canal y horario (hora de Argentina).
-- `tools/sports-taxonomy.mjs`: deportes y torneos (palabras clave). Agregá lo que falte ahí.
-- `tools/build-sports.mjs`: arma `data/sports.json` desde los canales argentinos y los deportivos de otros países.
-- `tools/sports-sites.txt`: fuentes de canales deportivos de otros países (hoy mi.tv de MX, BR, CL, CO, PE, PY). Para sumar más países o fuentes, agregá líneas `ruta|País|código`. El flujo imprime la lista de fuentes disponibles en iptv-org.
-- Un evento solo aparece si algún canal lo transmite y está en esas fuentes; Europa/EE.UU. necesitan otra fuente.
-
-
-## Qué es
-Mundo Deporte es una guía de deportes del mundo (no una guía de TV): eventos de hoy y los próximos 5 días, con canal, horario de Argentina, torneo, fase, fixture, resultados y tablas de posiciones.
-
-- Filtros: deporte (ordenados por relevancia), torneo, día, país del canal y botón "En vivo ahora" (solo eventos que están en emisión en este momento).
-- Vista de torneo: se abre al tocar el nombre de un torneo o al elegirlo en el buscador; muestra etapa, sede, fechas, partidos por fase y tabla de posiciones.
-- Datos: programación de canales (mi.tv) + `tools/fetch-espn.mjs` (API pública de ESPN: partidos, resultados, jugadores de tenis, tablas). Si ESPN falla, la app sigue con la programación de canales.
+- `tools/fetch-espn.mjs`: baja de ESPN (API pública, sin clave) los partidos de ayer a +5 días y las tablas de todas las ligas argentinas que encuentra (`arg.*`) y de las copas internacionales (solo partidos con equipos argentinos). Escribe `data/fixtures.json` y deja un registro por liga en `meta.diag`.
+- `.github/workflows/update.yml`: lo corre cada 3 horas (o a mano con "Run workflow").
+- `app.js`: además consulta ESPN desde el navegador cada minuto para los partidos en juego (resultado parcial y reloj).
+- Para sumar torneos: agregar su identificador de ESPN en `KNOWN` dentro de `tools/fetch-espn.mjs`.

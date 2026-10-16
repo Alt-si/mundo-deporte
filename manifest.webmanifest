@@ -1,7 +1,7 @@
 {
   "name": "Mundo Deporte",
   "short_name": "Mundo Deporte",
-  "description": "Deporte de todo el mundo: torneos, equipos, jugadores, canal y horario de Argentina.",
+  "description": "Fútbol argentino: partidos del día, resultados en vivo y tablas.",
   "lang": "es-AR",
   "start_url": "./",
   "scope": "./",

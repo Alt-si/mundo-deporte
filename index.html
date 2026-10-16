@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mundo Deporte</title>
-<meta name="description" content="Todo el deporte del mundo: buscá por deporte, torneo, equipo o jugador y mirá canal y horario de Argentina.">
+<meta name="description" content="Fútbol argentino: partidos del día, resultados en vivo y tablas. Horario de Argentina.">
 <meta name="theme-color" content="#0f1115">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -13,21 +13,20 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-view="sports">
+<body>
 <header class="top">
   <div class="top-row">
-    <h1>Mundo <span>Deporte</span></h1>
+    <h1>Mundo <span>Deporte</span><small>Fútbol argentino</small></h1>
+    <button class="live-btn" id="liveBtn" aria-pressed="false"><span class="dot"></span> En vivo <small id="liveN"></small></button>
   </div>
+  <div class="tabs" role="tablist"><button id="tabM" role="tab" aria-selected="true">Partidos</button><button id="tabT" role="tab" aria-selected="false">Tablas</button></div>
+  <nav id="days" class="days" aria-label="Día"></nav>
+  <div id="tours" class="chips" role="group" aria-label="Torneo"></div>
+  <input id="q" type="search" placeholder="Buscar equipo" aria-label="Buscar equipo" autocomplete="off">
 </header>
-
-<section id="sports" class="sports" aria-label="Deportes"></section>
-
-<dialog id="sheet">
-  <form method="dialog"><button class="close" aria-label="Cerrar">×</button></form>
-  <div id="sheetBody"></div>
-</dialog>
-
-<script src="util.js"></script>
-<script src="sports.js"></script>
+<main id="main"></main>
+<dialog id="sheet"><form method="dialog"><button class="close" aria-label="Cerrar">×</button></form><div id="sheetBody"></div></dialog>
+<script src="app.js"></script>
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});</script>
 </body>
 </html>
