@@ -180,3 +180,8 @@ body[data-view="sports"] #guideBar,body[data-view="sports"] #grid,body[data-view
 .it .live{flex:none;background:#e5322d;color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:2px 6px}
 .it .fin{flex:none;color:var(--muted);font-size:11px;font-weight:600}
 .sp-row select{flex:1 1 140px}
+.it .ico,.tv-name .ico{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-size:19px;line-height:1;
+  background:color-mix(in srgb,var(--cat,var(--c-ent)) 18%,var(--panel));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--cat,var(--c-ent)) 45%,transparent)}
+.tv-name{display:flex;align-items:center;gap:10px}
+.it .when{width:42px}
+.it .meta i{display:none}

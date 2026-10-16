@@ -202,6 +202,7 @@ function spCards(list, now) {
     const meta = [x.t ? `<span class="tg" data-t="${esc(x.t)}">${esc(x.t)}</span>` : "", [x.r, x.d].filter(Boolean).map(esc).join(" · "), x.co ? esc(x.co) : "", x.v ? "📍 " + esc(x.v) : ""].filter(Boolean).join('<i>·</i>');
     h += `<button class="it s-${x.sp}${done ? " past" : ""}" data-i="${i}">
       <span class="when"><b>${fmtTime(x.s)}</b><small>hs</small></span>
+      <span class="ico" title="${esc((ss.data.sports[x.sp] || {}).n || "")}" aria-hidden="true">${(ss.data.sports[x.sp] || {}).e || "🏅"}</span>
       <span class="body">
         ${pair ? `<span class="tm"><span>${esc(x.a)}</span>${scoreRow(x.sc, 0)}</span><span class="tm"><span>${esc(x.b)}</span>${scoreRow(x.sc, 1)}</span>` : `<span class="ttl">${esc(x.n || x.t)}</span>`}
         ${meta ? `<span class="meta">${meta}</span>` : ""}
@@ -227,7 +228,7 @@ function spTournament() {
   const chs = spChannels({ ch: [...new Set(all.flatMap((x) => x.ch))], bc: [...new Set(all.flatMap((x) => x.bc))] });
   const tbl = (d.tables || {})[T];
   let h = `<button class="tv-back">← Todos los torneos</button>
-  <div class="tv-head s-${sid}"><div class="tv-name">${sp.e || ""} ${esc(T)}</div>
+  <div class="tv-head s-${sid}"><div class="tv-name"><span class="ico">${sp.e || "🏅"}</span> ${esc(T)}</div>
     <div class="tv-meta">${esc(sp.n || "")}${tm.co ? " · " + esc(tm.co) : ""}${tm.v ? " · " + esc(tm.v) : ""}${isFinite(dMin) && isFinite(dMax) ? " · " + fd(dMin) + " – " + fd(dMax - 1) : ""}</div>
     ${tm.stage ? `<div class="tv-phase">Etapa: <b>${esc(tm.stage)}</b></div>` : cur ? `<div class="tv-phase">Fase actual: <b>${esc(cur)}</b></div>` : ""}
     ${chs.length ? `<div class="tv-ch">📺 Se ve en: ${esc(chText(chs, 8))}</div>` : ""}</div>`;
